@@ -1,0 +1,52 @@
+services:
+  backend:
+    image: sholehbaktiabadi/tempo-news-api
+    volumes:
+        - .env.backend:/build/.env
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "8000:8000"
+    networks:
+      - app_network
+
+  frontend:
+    image: sholehbaktiabadi/tempo-news-ui
+    volumes:
+        - .env.frontend:/app/.env
+    depends_on:
+      - backend
+    ports:
+      - "4173:4173"
+    networks:
+      - app_network
+
+  postgres:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_DB: tempo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
